@@ -2,7 +2,7 @@ import React from "react";
 import JsonToTable from "./components/JsonToTable";
 
 export default function App() {
-  fetch("/api/proxy")
+  const response = await fetch(`/api/proxy?url=${encodeURIComponent(apiUrl)}`);
   .then(res => res.json())
   .then(data => console.log(data))
   .catch(err => console.error(err));
