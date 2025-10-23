@@ -1,18 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import JsonToTable from "./components/JsonToTable";
 
 export default function App() {
-  try {
-  const response = await fetch(`/api/proxy?url=${encodeURIComponent(apiUrl)}`);
-  const data = await response.json();
-  console.log(data);
-} catch (err) {
-  console.error("Fetch error:", err);
-}
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  // 기본 API 주소 (원하면 input으로 변경 가능)
+  const apiUrl = "https://api.publicapis.org/entries";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`/api/proxy?url=${encodeURIComponent(apiUrl)}`);
+        if (!response.ok) throw new Error("Failed to fetch");
+        const result = await response.json();
+        setData(result.entries); // JsonToTable에 전달할 데이터
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [apiUrl]);
 
   return (
-    
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-6xl">
         <header className="text-center mb-8">
@@ -24,7 +41,9 @@ export default function App() {
           </p>
         </header>
 
-        <JsonToTable />
+        {loading && <p className="text-center text-gray-500">Loading...</p>}
+        {error && <p className="text-center text-red-500">Error: {error}</p>}
+        {data && <JsonToTable data={data} />}
 
         <footer className="text-center text-xs text-gray-400 mt-8">
           Made with 코딩하는쿼카
