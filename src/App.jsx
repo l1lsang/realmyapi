@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import JsonToTable from "./components/JsonToTable";
 
 export default function App() {
-  const [apiUrl, setApiUrl] = useState("https://api.publicapis.org/entries");
+  const [apiUrl, setApiUrl] = useState("https://jsonplaceholder.typicode.com/posts");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 버튼 클릭 시 호출
   const handleFetch = async () => {
     if (!apiUrl) return;
     setLoading(true);
@@ -18,8 +17,7 @@ export default function App() {
       const response = await fetch(`/api/proxy?url=${encodeURIComponent(apiUrl)}`);
       if (!response.ok) throw new Error("Failed to fetch API");
       const result = await response.json();
-      // JsonToTable에 전달할 데이터
-      setData(result.entries || result);
+      setData(result); 
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err.message);
@@ -36,11 +34,10 @@ export default function App() {
             🌐 JSON API → Table 변환기
           </h1>
           <p className="text-gray-500 text-sm">
-            공개된 JSON 데이터 주소를 입력하고 버튼을 누르면, 자동으로 테이블로 변환됩니다 💡
+            URL을 입력하고 버튼 클릭 시, Vercel proxy를 통해 안전하게 JSON → Table 변환 💡
           </p>
         </header>
 
-        {/* URL 입력 & 버튼 */}
         <div className="flex flex-col sm:flex-row gap-2 mb-4 justify-center">
           <input
             type="text"
@@ -57,11 +54,9 @@ export default function App() {
           </button>
         </div>
 
-        {/* 상태 표시 */}
         {loading && <p className="text-gray-500 text-center">Loading...</p>}
         {error && <p className="text-red-500 text-center">Error: {error}</p>}
 
-        {/* 데이터 테이블 */}
         {data && <JsonToTable data={data} />}
 
         <footer className="text-center text-xs text-gray-400 mt-8">
