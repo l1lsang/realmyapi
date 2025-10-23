@@ -7,16 +7,19 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // 버튼 클릭 시 호출
   const handleFetch = async () => {
     if (!apiUrl) return;
     setLoading(true);
     setError(null);
     setData(null);
+
     try {
       const response = await fetch(`/api/proxy?url=${encodeURIComponent(apiUrl)}`);
-      if (!response.ok) throw new Error("Failed to fetch");
+      if (!response.ok) throw new Error("Failed to fetch API");
       const result = await response.json();
-      setData(result.entries || result); // entries 없으면 전체 전달
+      // JsonToTable에 전달할 데이터
+      setData(result.entries || result);
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err.message);
